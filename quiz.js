@@ -409,6 +409,11 @@ const questionElement = document.getElementById("question"); //frågan deklarera
 const answerButtons = document.getElementById("answer-btn");//svarsalternativ deklareras
 const nextBtn = document.getElementById("next-btn"); //next button deklareras
 
+//Ny-25 nov 2025
+const prevBtn = document.getElementById("prev-btn");
+const progressText = document.getElementById("progress");
+let userAnswers = new Array(questions.length).fill(null);
+
 //skapa fråge-index
 let currentQuestionIndex = 0; //startas från 0
 let score = 0;
@@ -417,8 +422,10 @@ let score = 0;
 function startQuiz (){
     currentQuestionIndex = 0;
     score = 0;
+    userAnswers = new Array(questions.length).fill(null);//nya ändringar-24 nov 2025
     nextBtn.innerHTML = "Next";
     showQuestion(); //när ovan principer är OK, då kallas denna funktionen
+    updateProgress();//nya ändringar-24 nov 2025
 }
 
 
@@ -452,6 +459,9 @@ function showQuestion(){
         //eventlisten to select answer
         button.addEventListener("click", selectAnswer);
     });
+
+    // NY ÄNDRING: NEXT BUTTON ALLTID VISAS-24 nov 2025
+    nextBtn.style.display = "block"; 
 }
 
 function  resetState(){
@@ -464,6 +474,10 @@ function  resetState(){
 function selectAnswer(x){
     const selectedBtn = x.target; //valda svarsalternativ
     const isCorrect = selectedBtn.dataset.correct === "true";//kontroll= om svaret är korrekt
+    
+    //Nya ändringar - den 24 nov 2025
+    userAnswers[currentQuestionIndex] = selectedBtn.innerHTML;
+
     if(isCorrect){
         selectedBtn.classList.add("correct");
         score++;
@@ -481,8 +495,17 @@ function selectAnswer(x){
     });
     nextBtn.style.display = "block";//vida "next" button!
 
+    //Nya ändringar - den 24 nov 2025
+    updateProgress();
+    nextBtn.style.display = "block"; // NY ÄNDRING: SE TILL ATT NEXT ÄR SYNLIG EFTER SVAR
 }
 
+
+//Update Progress funkion-//Nya ändringar - den 24 nov 2025
+function updateProgress() {
+    const besvarade = userAnswers.filter(a => a !== null).length;
+    progressText.textContent = `Besvarade: ${besvarade} / ${questions.length}`;
+}
 
 //score function
 function showScore() {
@@ -498,6 +521,7 @@ function handleNextButton(){
     currentQuestionIndex++;
     if(currentQuestionIndex < questions.length){
         showQuestion();
+        nextBtn.innerHTML = "Nästa"; // NY ÄNDRING: ÅTERSTÄLL TEXT TILL "Next" NÄR MAN GÅR VIDARE
     }else{
         showScore();
     }
@@ -509,6 +533,17 @@ nextBtn.addEventListener("click", ()=>{
         handleNextButton();
     }else{
         startQuiz();
+        nextBtn.innerHTML = "Nästa"; // NY ÄNDRING: ÅTERSTÄLL TEXT TILL "Next" NÄR QUIZ STARTAS OM
+    }
+});
+
+
+// Tillbaka-knapp- NY ÄNDRING 24 NOV 2025
+prevBtn.addEventListener("click", () => {
+    if(currentQuestionIndex > 0){
+        currentQuestionIndex--;
+        showQuestion();
+        nextBtn.innerHTML = "Nästa"; // NY ÄNDRING: SE TILL ATT NEXT HAR KORREKT TEXT
     }
 });
 
